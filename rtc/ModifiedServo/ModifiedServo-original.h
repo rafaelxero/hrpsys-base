@@ -142,16 +142,13 @@ class ModifiedServo  : public RTC::DataFlowComponentBase
   double step;    // current interpolation step
   double nstep;   // number of steps to interpolate references
 
-  size_t dof, loop;
-  unsigned int m_debugLevel;
-  int dummy;
+  size_t dof;
 
   std::string gain_fname;
   std::ifstream gain;
 
   hrp::dvector Pgain, Dgain;
   hrp::dvector q_old, qRef_old;
-  hrp::dvector tau_limit_ratio;
 };
 
 
