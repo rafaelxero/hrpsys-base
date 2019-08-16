@@ -10,6 +10,8 @@
 #include "ModifiedServo.h"
 // #include <iostream>  // Added by Rafa
 
+#define DELAY 4
+
 // Module specification
 // <rtc-template block="module_spec">
 static const char* modifiedservo_spec[] =
@@ -146,12 +148,29 @@ RTC::ReturnCode_t ModifiedServo::onActivated(RTC::UniqueId ec_id)
   
   m_tau.data.length(m_dof);
 
+  m_qRef_in.resize(m_dof);
+  m_tauRef_in.resize(m_dof);
+  m_torqueMode_in.resize(m_dof);
+
+  m_qRef_curr.resize(m_dof);
+  m_tauRef_curr.resize(m_dof);
+  m_torqueMode_curr.resize(m_dof);
+  
   for (size_t i = 0; i < m_dof; i++) {
     m_tauRef.data[i] = 0.0;
     m_qRef.data[i] = m_qRef_old[i] = m_q_old[i] = m_q.data[i];
     m_torqueMode.data[i] = false;
+    m_qRef_in[i] = m_qRef_curr[i] = m_q.data[i];
+    m_tauRef_in[i] = m_tauRef_curr[i] = 0.0;
+    m_torqueMode_in[i] = m_torqueMode_curr[i] = false;
   }
   
+  for (size_t i = 0; i < DELAY; i++) {
+    m_qRef_queue.push(m_qRef_in);
+    m_tauRef_queue.push(m_tauRef_in);
+    m_torqueMode_queue.push(m_torqueMode_in);
+  }
+
   return RTC::RTC_OK;
 }
 
@@ -164,24 +183,58 @@ RTC::ReturnCode_t ModifiedServo::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t ModifiedServo::onExecute(RTC::UniqueId ec_id)
 {
-  if (m_tauRefIn.isNew())
-    m_tauRefIn.read();
-  
   if (m_qIn.isNew())
     m_qIn.read();
 
   if (m_qRefIn.isNew()) {
+    
     m_qRefIn.read();
     m_step = m_nstep;
+    
+    for (size_t i = 0; i < m_dof; i++)
+      m_qRef_in[i] = m_qRef.data[i];
+    
+    m_qRef_queue.push(m_qRef_in);
+    m_qRef_curr = m_qRef_queue.front();
+    m_qRef_queue.pop();
   }
 
-  if (m_torqueModeIn.isNew())
+  if (m_tauRefIn.isNew()) {
+
+    m_tauRefIn.read();
+
+    for (size_t i = 0; i < m_dof; i++)
+      m_tauRef_in[i] = m_tauRef.data[i];
+
+    m_tauRef_queue.push(m_tauRef_in);
+    m_tauRef_curr = m_tauRef_queue.front();
+    m_tauRef_queue.pop();
+  }
+
+  if (m_torqueModeIn.isNew()) {
+    
     m_torqueModeIn.read();
 
+    for (size_t i = 0; i < m_dof; i++)
+      m_torqueMode_in[i] = m_torqueMode.data[i];
+
+    m_torqueMode_queue.push(m_torqueMode_in);
+    m_torqueMode_curr = m_torqueMode_queue.front();
+    m_torqueMode_queue.pop();
+  }
+
+  /*
+  coil::TimeValue coiltm(coil::gettimeofday());
+  std::cout << "Rafa, at t = " << coiltm.usec() / 1000 << " [ms], "
+            << "m_qRef_in[21] = " << m_qRef_in[21] << ", m_qRef_curr[21] = " << m_qRef_curr[21]
+            << std::endl;
+  */
+  
   for (size_t i = 0; i < m_dof; i++) {
     
     double q = m_q.data[i];
-    double qCom = m_step > 0 ? m_qRef_old[i] + (m_qRef.data[i] - m_qRef_old[i]) / m_step : m_qRef_old[i];
+    // double qCom = m_step > 0 ? m_qRef_old[i] + (m_qRef_in[i] - m_qRef_old[i]) / m_step : m_qRef_old[i];
+    double qCom = m_step > 0 ? m_qRef_old[i] + (m_qRef_curr[i] - m_qRef_old[i]) / m_step : m_qRef_old[i];
 
     double dq = (q - m_q_old[i]) / m_dt;
     double dqCom = (qCom - m_qRef_old[i]) / m_dt;
@@ -189,7 +242,8 @@ RTC::ReturnCode_t ModifiedServo::onExecute(RTC::UniqueId ec_id)
     m_q_old[i] = q;
     m_qRef_old[i] = qCom;
 
-    double tau = m_torqueMode.data[i] ? m_tauRef.data[i] : m_Pgain[i] * (qCom - q) + m_Dgain[i] * (dqCom - dq);
+    // double tau = m_torqueMode_in[i] ? m_tauRef_in[i] : m_Pgain[i] * (qCom - q) + m_Dgain[i] * (dqCom - dq);
+    double tau = m_torqueMode_curr[i] ? m_tauRef_curr[i] : m_Pgain[i] * (qCom - q) + m_Dgain[i] * (dqCom - dq);
 
     double tau_limit = m_robot->joint(i)->torqueConst * m_robot->joint(i)->climit * m_robot->joint(i)->gearRatio;
 

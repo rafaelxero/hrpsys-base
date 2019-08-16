@@ -23,6 +23,8 @@
 #include <hrpModel/Body.h>
 #include <hrpModel/Link.h>
 
+#include <queue>
+
 // Service implementation headers
 // <rtc-template block="service_impl_h">
 
@@ -149,6 +151,15 @@ class ModifiedServo  : public RTC::DataFlowComponentBase
 
   hrp::dvector m_Pgain, m_Dgain;
   hrp::dvector m_q_old, m_qRef_old;
+
+  std::queue< std::vector<double> > m_qRef_queue, m_tauRef_queue;
+  std::queue< std::vector<bool>   > m_torqueMode_queue;
+  
+  std::vector<double> m_qRef_in, m_tauRef_in;
+  std::vector<bool>   m_torqueMode_in;
+  
+  std::vector<double> m_qRef_curr, m_tauRef_curr;
+  std::vector<bool>   m_torqueMode_curr;
 };
 
 
