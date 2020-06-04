@@ -190,15 +190,42 @@ RTC::ReturnCode_t ModifiedServo::onExecute(RTC::UniqueId ec_id)
     qRef_old[i] = qRef;
 
     double tau = m_torqueMode.data[i] ? m_tauRef.data[i] : Pgain[i] * (qRef - q) + Dgain[i] * (dqRef - dq);
+    
+    double tau_limit = m_robot->joint(i)->torqueConst * m_robot->joint(i)->climit * abs(m_robot->joint(i)->gearRatio);
 
-    double tau_limit = m_robot->joint(i)->torqueConst * m_robot->joint(i)->climit * m_robot->joint(i)->gearRatio;
-
+    /*
+    std::cout << "Rafa, in ModifiedServo::onExecute, for i = " << i << ", torqueConst = " << m_robot->joint(i)->torqueConst
+              << ", climit = " << m_robot->joint(i)->climit << ", gearRatio = " << m_robot->joint(i)->gearRatio
+              << ", tau_limit = " << tau_limit << std::endl;
+    */
+    /*
+    std::cout << "Rafa, in ModifiedServo::onExecute, for i = " << i << ", Pgain = " << Pgain[i] << ", Dgain = " << Dgain[i]
+              << ", q = " << q << ", qRef = " << qRef << ", dq = " << dq << ", dqRef = " << dqRef << ", tau = " << tau
+              << ", tau_limit = " << tau_limit << std::endl;
+    */
+    
     m_tau.data[i] = std::max(std::min(tau, tau_limit), -tau_limit);
-
-    // if (i == 11 || i == 21)
-    //     std::cout << "Rafa, in ModifiedServo::onExecute, for i = " << i << ", q[i] = " << q << ", qRef[i] = " << qRef
-    //               << ", tau[i] = " << tau << ", tau_limit[i] = " << tau_limit << ", m_tau[i] = " << m_tau.data[i] << std::endl;
   }
+
+  /*
+  std::cout << "Rafa, in ModifiedServo::onExecute, qRef = ";
+  for (size_t i = 0; i < 6; i++) {
+      std::cout << m_qRef.data[i] << " ";
+  }
+  std::cout << std::endl; // Rafa
+
+  std::cout << "Rafa, in ModifiedServo::onExecute, q = ";
+  for (size_t i = 0; i < 6; i++) {
+      std::cout << m_q.data[i] << " ";
+  }
+  std::cout << std::endl; // Rafa
+
+  std::cout << "Rafa, in ModifiedServo::onExecute, tau = ";
+  for (size_t i = 0; i < dof; i++) {
+      std::cout << m_tau.data[i] << " ";
+  }
+  std::cout << std::endl << std::endl; // Rafa
+  */
 
   step--;
 
