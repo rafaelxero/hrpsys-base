@@ -595,6 +595,13 @@ int robot::readServoState(int i)
     return v;
 }
 
+int robot::readCntrlState(int i)
+{
+    int v=0;
+    read_cntrl_state(i, &v);
+    return v;
+}
+
 int robot::readServoAlarm(int i)
 {
     int v=0;

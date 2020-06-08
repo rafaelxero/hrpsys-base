@@ -112,6 +112,13 @@ public:
     int readServoState(int i);
 
     /**
+       \brief read control status of a joint servo
+       \param i joint id
+       \return 1 if the joint is controlled in torque-mode, 0 if in position-mode 
+     */
+    int readCntrlState(int i);
+    
+    /**
        \brief read alarm information of a joint servo
        \param i joint id
        \return 0 if there is no alarm, see iob.h for more details.

@@ -17,9 +17,11 @@ module OpenHRP
     const unsigned long POWER_STATE_SHIFT = 2;
     const unsigned long SERVO_ALARM_MASK = 0x0007fff8;
     const unsigned long SERVO_ALARM_SHIFT = 3;
+    const unsigned long CONTROL_MODE_MASK = 0x00380000;
+    const unsigned long CONTROL_MODE_SHIFT = 19;
     const unsigned long DRIVER_TEMP_MASK = 0xff000000;
     const unsigned long DRIVER_TEMP_SHIFT = 24;
-
+      
     typedef sequence<octet>  OctSequence;
     typedef sequence<double> DblSequence;
     typedef sequence<long>   LongSequence;
@@ -47,7 +49,8 @@ module OpenHRP
        * 1: servo status ( 1 => on )\n
        * 2: power status ( 1 => supplied )\n
        * 3-18: servo alarms (see @ref iob.h)\n
-       * 19-23: unused
+       * 19-21: control mode (see @ref iob.h)\n
+       * 22-23: unused
        * 24-31: driver temperature (deg)
        */
       LongSequenceSequence		servoState;
@@ -188,7 +191,8 @@ module OpenHRP
        * 1: servo status ( 1 => on )\n
        * 2: power status ( 1 => supplied )\n
        * 3-18: servo alarms (see @ref iob.h)\n
-       * 19-23: unused
+       * 19-21: control mode (see @ref iob.h)\n
+       * 20-23: unused
        * 24-31: driver temperature (deg)
        */
       LongSequenceSequence		servoState;
