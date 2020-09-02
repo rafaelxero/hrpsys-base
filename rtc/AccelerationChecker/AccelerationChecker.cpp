@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "AccelerationChecker.h"
 #include "hrpsys/idl/RobotHardwareService.hh"
+#include "hrpsys/io/iob.h"
 
 // Module specification
 // <rtc-template block="module_spec">
@@ -144,15 +145,30 @@ RTC::ReturnCode_t AccelerationChecker::onExecute(RTC::UniqueId ec_id)
         }
         m_dq.data.length(m_q.data.length());
     }
+
+    std::cout << "Rafa, in AccelerationChecker::onExecute, m_q.data = ";
+    for (size_t i = 0; i < 6; i++) // Rafa added as test
+        std::cout << m_q.data[i] << " "; // Rafa added as test
+    std::cout << std::endl; // Rafa added as test
+    
     for (unsigned int i=0; i<m_q.data.length(); i++){
         m_dq.data[i] = (m_q.data[i] - m_qOld.data[i])/m_dt;
         double ddq = (m_dq.data[i] - m_dqOld.data[i])/m_dt;
         bool servo = true;
+        bool position_ctrl = true;
         if (m_servoState.data.length()==m_q.data.length()){
             servo = m_servoState.data[i][0] & OpenHRP::RobotHardwareService::SERVO_STATE_MASK;
+            position_ctrl = ((m_servoState.data[i][0] & OpenHRP::RobotHardwareService::CONTROL_MODE_MASK) >> OpenHRP::RobotHardwareService::CONTROL_MODE_SHIFT)
+                == JCM_POSITION;
+            std::cout << "Rafa, in AccelerationChecker::onExecute, passed the test of m_servoState"
+                      << std::endl;
         }
         if (fabs(ddq) > m_ddqMax.data[i]) m_ddqMax.data[i] = fabs(ddq);
-        if (servo && fabs(ddq) > m_thd){
+        // std::cout << "Rafa, in AccelerationChecker::onExecute, m_q.data[" << i << "] = "
+        //          << m_q.data[i] << std::endl;
+        // std::cout << "Rafa, in AccelerationChecker::onExecute, fabs(ddq) = " << fabs(ddq)
+        //          << " and m_thd = " << m_thd << std::endl;
+        if (servo && position_ctrl && fabs(ddq) > m_thd){
             time_t now = time(NULL);
             struct tm *tm_now = localtime(&now);
             char *datetime = asctime(tm_now);

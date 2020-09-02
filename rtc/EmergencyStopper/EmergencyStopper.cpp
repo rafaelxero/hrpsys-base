@@ -14,6 +14,7 @@
 #include <hrpModel/Link.h>
 #include <hrpModel/Sensor.h>
 #include "hrpsys/idl/RobotHardwareService.hh"
+#include "hrpsys/io/iob.h"
 
 #include "EmergencyStopper.h"
 #include <iomanip>
@@ -206,6 +207,7 @@ RTC::ReturnCode_t EmergencyStopper::onInitialize()
         status |= 1<< OpenHRP::RobotHardwareService::CALIB_STATE_SHIFT;
         status |= 1<< OpenHRP::RobotHardwareService::POWER_STATE_SHIFT;
         status |= 1<< OpenHRP::RobotHardwareService::SERVO_STATE_SHIFT;
+        status |= JCM_POSITION<< OpenHRP::RobotHardwareService::CONTROL_MODE_SHIFT;
         status |= 0<< OpenHRP::RobotHardwareService::SERVO_ALARM_SHIFT;
         status |= 0<< OpenHRP::RobotHardwareService::DRIVER_TEMP_SHIFT;
         m_servoState.data[i][0] = status;

@@ -20,6 +20,7 @@
 #endif // USE_HRPSYSUTIL
 #include "hrpsys/util/BVutil.h"
 #include "hrpsys/idl/RobotHardwareService.hh"
+#include "hrpsys/io/iob.h"
 
 #include "CollisionDetector.h"
 
@@ -280,6 +281,7 @@ RTC::ReturnCode_t CollisionDetector::onInitialize()
         status |= 1<< OpenHRP::RobotHardwareService::CALIB_STATE_SHIFT;
         status |= 1<< OpenHRP::RobotHardwareService::POWER_STATE_SHIFT;
         status |= 1<< OpenHRP::RobotHardwareService::SERVO_STATE_SHIFT;
+        status |= JCM_POSITION<< OpenHRP::RobotHardwareService::CONTROL_MODE_SHIFT;
         status |= 0<< OpenHRP::RobotHardwareService::SERVO_ALARM_SHIFT;
         status |= 0<< OpenHRP::RobotHardwareService::DRIVER_TEMP_SHIFT;
         m_servoState.data[i][0] = status;
