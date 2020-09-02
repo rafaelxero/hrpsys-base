@@ -595,10 +595,10 @@ int robot::readServoState(int i)
     return v;
 }
 
-int robot::readCntrlState(int i)
+joint_control_mode robot::readControlMode(int i)
 {
-    int v=0;
-    read_cntrl_state(i, &v);
+    joint_control_mode v = JCM_POSITION;
+    read_control_mode(i, &v);
     return v;
 }
 
