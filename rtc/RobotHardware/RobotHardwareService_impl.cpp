@@ -40,8 +40,8 @@ RobotHardwareService_impl::~RobotHardwareService_impl()
         status |= v<< OpenHRP::RobotHardwareService::POWER_STATE_SHIFT; \
         v = m_robot->readServoState(i);                                 \
         status |= v<< OpenHRP::RobotHardwareService::SERVO_STATE_SHIFT; \
-        v = m_robot->readCntrlState(i);                                 \
-        status |= v<< OpenHRP::RobotHardwareService::CNTRL_STATE_SHIFT; \
+        v = m_robot->readControlMode(i);                                \
+        status |= v<< OpenHRP::RobotHardwareService::CONTROL_MODE_SHIFT; \
         v = m_robot->readServoAlarm(i);                                 \
         status |= v<< OpenHRP::RobotHardwareService::SERVO_ALARM_SHIFT; \
         v = m_robot->readDriverTemperature(i);                          \

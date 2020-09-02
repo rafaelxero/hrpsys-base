@@ -326,7 +326,7 @@ RTC::ReturnCode_t RobotHardware::onExecute(RTC::UniqueId ec_id)
       status |= v<< OpenHRP::RobotHardwareService::POWER_STATE_SHIFT;
       v = m_robot->readServoState(i);
       status |= v<< OpenHRP::RobotHardwareService::SERVO_STATE_SHIFT;
-      v = m_robot->readCntrlState(i);
+      v = m_robot->readControlMode(i);
       status |= v<< OpenHRP::RobotHardwareService::CONTROL_MODE_SHIFT;
       v = m_robot->readServoAlarm(i);
       status |= v<< OpenHRP::RobotHardwareService::SERVO_ALARM_SHIFT;
@@ -390,8 +390,8 @@ void getStatus(boost::shared_ptr<robot> robot, T& rstate)
     status |= v<< OpenHRP::RobotHardwareService::POWER_STATE_SHIFT;
     v = robot->readServoState(i);
     status |= v<< OpenHRP::RobotHardwareService::SERVO_STATE_SHIFT;
-    v = robot->readCntrlState(i);
-    status |= v<< OpenHRP::RobotHardwareService::CNTRL_STATE_SHIFT;
+    v = robot->readControlMode(i);
+    status |= v<< OpenHRP::RobotHardwareService::CONTROL_MODE_SHIFT;
     v = robot->readServoAlarm(i);
     status |= v<< OpenHRP::RobotHardwareService::SERVO_ALARM_SHIFT;
     v = robot->readDriverTemperature(i);
