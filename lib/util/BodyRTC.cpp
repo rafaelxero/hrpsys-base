@@ -446,6 +446,8 @@ void BodyRTC::getStatus(OpenHRP::RobotHardwareService::RobotState* rs) {
         status |= v<< OpenHRP::RobotHardwareService::POWER_STATE_SHIFT;
         v = readServoState(i);
         status |= v<< OpenHRP::RobotHardwareService::SERVO_STATE_SHIFT;
+        //v = readControlMode(i);
+        //status |= v<< OpenHRP::RobotHardwareService::CONTROL_MODE_SHIFT;
         //v = readServoAlarm(i);
         //status |= v<< OpenHRP::RobotHardwareService::SERVO_ALARM_SHIFT;
         //v = readDriverTemperature(i);

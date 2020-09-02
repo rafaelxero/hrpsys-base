@@ -1713,10 +1713,11 @@ dr=0, dp=0, dw=0, tm=10, wait=True):
                * 1: servo status ( 1 => on )\n
                * 2: power status ( 1 => supplied )\n
                * 3-18: servo alarms (see @ref iob.h)\n
-               * 19-23: unused
-                       * 24-31: driver temperature (deg)
+               * 19-21: control mode (see @ref iob.h)\n
+               * 22-23: unused
+               * 24-31: driver temperature (deg)
                */
-              LongSequenceSequence              servoState;
+              LongSequenceSequence      servoState;
               sequence<DblSequence6>    force;    ///< forces[N] and torques[Nm]
               sequence<DblSequence3>    rateGyro; ///< angular velocities[rad/s]
               sequence<DblSequence3>    accel;    ///< accelerations[m/(s^2)]
