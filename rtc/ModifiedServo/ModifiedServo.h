@@ -17,6 +17,7 @@
 #include <rtm/CorbaNaming.h>
 #include <rtm/DataInPort.h>
 #include <rtm/DataOutPort.h>
+#include "hrpsys/idl/HRPDataTypes.hh"
 
 #include <hrpUtil/EigenTypes.h>
 #include <hrpModel/ModelLoaderUtil.h>
@@ -113,6 +114,8 @@ class ModifiedServo  : public RTC::DataFlowComponentBase
   // <rtc-template block="outport_declare">
   TimedDoubleSeq m_tau;
   OutPort<TimedDoubleSeq> m_tauOut;
+  OpenHRP::TimedLongSeqSeq m_servoState;
+  OutPort<OpenHRP::TimedLongSeqSeq> m_servoStateOut;  
 
   // </rtc-template>
 

@@ -8,6 +8,8 @@
  */
 
 #include "ModifiedServo.h"
+#include "hrpsys/idl/RobotHardwareService.hh"
+#include "hrpsys/io/iob.h"
 
 // Module specification
 // <rtc-template block="module_spec">
@@ -37,6 +39,7 @@ ModifiedServo::ModifiedServo(RTC::Manager* manager)
     m_qIn("q", m_q),
     m_torqueModeIn("torqueMode", m_torqueMode),
     m_tauOut("tau", m_tau),
+    m_servoStateOut("servoState", m_servoState),
     // </rtc-template>
     gain_fname(""),
     dt(0.005),
@@ -61,6 +64,7 @@ RTC::ReturnCode_t ModifiedServo::onInitialize()
 
   // Set OutPort buffer
   addOutPort("tau", m_tauOut);
+  addOutPort("servoState", m_servoStateOut);
 
   // Set service provider to Ports
 
@@ -145,6 +149,7 @@ RTC::ReturnCode_t ModifiedServo::onActivated(RTC::UniqueId ec_id)
   m_torqueMode.data.length(dof);
   
   m_tau.data.length(dof);
+  m_servoState.data.length(dof);
 
   for (size_t i = 0; i < dof; i++) {
     m_tauRef.data[i] = 0.0;
@@ -178,6 +183,13 @@ RTC::ReturnCode_t ModifiedServo::onExecute(RTC::UniqueId ec_id)
   if (m_torqueModeIn.isNew())
     m_torqueModeIn.read();
 
+  /*
+  std::cout << "Rafa, in ModifiedServo::onExecute, m_qRef.data = ";
+  for (size_t i = 0; i < 6; i++) // Rafa added as test
+      std::cout << m_qRef.data[i] << " "; // Rafa added as test
+  std::cout << std::endl; // Rafa added as test
+  */
+  
   for (size_t i = 0; i < dof; i++) {
     
     double q = m_q.data[i];
@@ -200,6 +212,22 @@ RTC::ReturnCode_t ModifiedServo::onExecute(RTC::UniqueId ec_id)
 
   m_tau.tm = m_q.tm;
   m_tauOut.write();
+
+  for (size_t i = 0; i < dof; i++) {
+      m_servoState.data[i].length(1);
+      int status = 0;
+      status |= 1 << OpenHRP::RobotHardwareService::CALIB_STATE_SHIFT;
+      status |= 1 << OpenHRP::RobotHardwareService::POWER_STATE_SHIFT;
+      status |= 1 << OpenHRP::RobotHardwareService::SERVO_STATE_SHIFT;
+      status |= (m_torqueMode.data[i] ? JCM_TORQUE : JCM_POSITION)
+          << OpenHRP::RobotHardwareService::CONTROL_MODE_SHIFT;
+      status |= 0 << OpenHRP::RobotHardwareService::SERVO_ALARM_SHIFT;
+      status |= 0 << OpenHRP::RobotHardwareService::DRIVER_TEMP_SHIFT;
+      m_servoState.data[i][0] = status;
+  }
+
+  m_servoState.tm = m_q.tm;
+  m_servoStateOut.write();
   
   return RTC::RTC_OK;
 }
