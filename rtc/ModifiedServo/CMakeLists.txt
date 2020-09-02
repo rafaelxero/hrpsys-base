@@ -1,6 +1,6 @@
 set(comp_sources ModifiedServo.cpp)
 add_library(ModifiedServo SHARED ${comp_sources})
-set(libs hrpModel-3.1 ${OPENRTM_LIBRARIES})
+set(libs hrpModel-3.1 hrpsysBaseStub ${OPENRTM_LIBRARIES})
 target_link_libraries(ModifiedServo ${libs})
 set_target_properties(ModifiedServo PROPERTIES PREFIX "")
 
